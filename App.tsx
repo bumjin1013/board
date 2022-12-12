@@ -1,20 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+import { createStore, applyMiddleware, compose } from 'redux';
+import { Provider, Provider as ReduxProvider } from "react-redux";
+import React from 'react';
+import promiseMiddleware from 'redux-promise'; 
+import ReduxThunk from 'redux-thunk';
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import Reducer from './_reducers'
+import Navigation from './navigation';
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
+
+const store = createStoreWithMiddleware(Reducer,composeEnhancers())
+
+export default function App() {
+  
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <Navigation/>
+      </SafeAreaProvider>
+    </Provider>
+  );
+}
